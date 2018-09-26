@@ -26,6 +26,8 @@ Variables represent values in your system, usually the value of some particular 
 
 You define all the available variables for a certain kind of object in your code, and then later dynamically set the conditions and thresholds for those.
 
+**Update 9/2018 EF:** Rule variables now allow for function parameters. This allows for passing a parameter from the JSON object to the functions. Example of usage in `month_equals()` and JSON in section 3. Parameter use is the same as for actions, described in section 2.
+
 For example:
 
 ```python
@@ -50,6 +52,11 @@ class ProductVariables(BaseVariables):
     @select_rule_variable(options=Products.top_holiday_items())
     def goes_well_with(self):
         return products.related_products
+        
+    @boolean_rule_variable(params={"month": FIELD_STRING})
+    def month_equals(self, month):
+        return datetime.datetime.now().strftime("%B") == month
+
 ```
 
 ### 2. Define your set of actions
@@ -124,11 +131,17 @@ rules = [
   ],
 },
 
-# current_inventory < 5 OR (current_month = "December" AND current_inventory < 20)
+# current_inventory < 5 OR current_month = "September" OR (current_month = "December" AND current_inventory < 20)
+# i.e. Order more if inventory < 5, if September, or if both December and inventory < 20
 { "conditions": { "any": [
       { "name": "current_inventory",
         "operator": "less_than",
         "value": 5,
+      },
+      { "name": "month_equals",
+        "params":{"month": 'September'},
+        "operator": "is_true",
+        "value": 1,
       },
     ]},
       { "all": [
