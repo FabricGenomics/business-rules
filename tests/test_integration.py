@@ -16,6 +16,10 @@ class SomeVariables(BaseVariables):
     def ten(self):
         return 10
 
+    @numeric_rule_variable(label="num_param", params={'number': FIELD_NUMERIC})
+    def num_param(self, number=5):
+        return number
+
     @boolean_rule_variable()
     def true_bool(self):
         return True
@@ -115,15 +119,23 @@ class IntegrationTests(TestCase):
                          [{"name": "foo",
                            "label": "Foo",
                            "field_type": "string",
-                           "options": []},
+                           "options": [],
+                           "params": None},
+                          {'field_type': 'numeric',
+                           'label': 'num_param',
+                           'name': 'num_param',
+                           'options': [],
+                           'params': [{'fieldType': 'numeric', 'label': 'Number', 'name': 'number'}]},
                           {"name": "ten",
                            "label": "Diez",
                            "field_type": "numeric",
-                           "options": []},
+                           "options": [],
+                           "params": None},
                           {'name': 'true_bool',
                            'label': 'True Bool',
                            'field_type': 'boolean',
-                           'options': []}])
+                           'options': [],
+                           "params": None}])
 
         self.assertEqual(all_data.get("variable_type_operators"),
                          {'boolean': [{'input_type': 'none',
